@@ -2,12 +2,23 @@ package app
 
 import (
 	"database/sql"
+	"fmt"
+	_ "github.com/lib/pq"
 	"go-restful-fiber/helper"
 	"time"
 )
 
+const (
+	host     = "localhost"
+	port     = 5435
+	user     = "postgres"
+	password = "goApiPostgres1234"
+	dbname   = "go_api_db"
+)
+
 func NewDB() *sql.DB {
-	db, err := sql.Open("mysql", "root:123456qwerty@tcp(localhost:3306)/belajar_go_restful_api")
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	db, err := sql.Open("postgres", psqlInfo)
 	helper.PanicIfError(err)
 
 	db.SetMaxIdleConns(5)
