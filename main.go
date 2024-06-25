@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/go-playground/validator/v10"
-	_ "github.com/go-sql-driver/mysql"
 	"go-restful-fiber/app"
 	"go-restful-fiber/controller"
 	"go-restful-fiber/helper"
