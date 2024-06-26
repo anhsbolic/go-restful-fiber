@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go-restful-fiber/config"
 	"go-restful-fiber/exception"
+	"go-restful-fiber/middleware"
 	"go-restful-fiber/pkg"
 	"go-restful-fiber/routes"
 	"time"
@@ -24,6 +25,9 @@ func main() {
 		Prefork:      true,
 		ErrorHandler: exception.NewErrorHandler,
 	})
+
+	// Set Global Middleware
+	server.Use(middleware.XApiKeyMiddleware)
 
 	// Setup DB
 	db := pkg.NewDB()
