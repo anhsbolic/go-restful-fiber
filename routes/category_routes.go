@@ -17,4 +17,5 @@ func InitCategoryRoutes(server *fiber.App, db *sql.DB, validate *validator.Valid
 
 	// Set Routes
 	server.Get("/api/v1/categories", categoryController.FindAll)
+	server.Get("/api/v1/categories/:categoryId", categoryController.FindById)
 }

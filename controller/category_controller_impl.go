@@ -2,11 +2,9 @@ package controller
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/julienschmidt/httprouter"
 	"go-restful-fiber/model/dto"
 	"go-restful-fiber/pkg"
 	"go-restful-fiber/service"
-	"net/http"
 	"strconv"
 )
 
@@ -20,75 +18,75 @@ func NewCategoryController(categoryService service.CategoryService) CategoryCont
 	}
 }
 
-func (controller *CategoryControllerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	categoryCreateRequest := dto.CategoryCreateRequest{}
-	pkg.ReadFromRequestBody(request, &categoryCreateRequest)
-
-	categoryResponse := controller.CategoryService.Create(request.Context(), categoryCreateRequest)
-	webResponse := dto.ApiResponse{
-		Code:   200,
-		Status: "OK",
-		Data:   categoryResponse,
-	}
-
-	pkg.WriteToResponseBody(writer, webResponse)
+func (controller *CategoryControllerImpl) Create(ctx *fiber.Ctx) error {
+	panic("implement me")
+	//categoryCreateRequest := dto.CategoryCreateRequest{}
+	//pkg.ReadFromRequestBody(request, &categoryCreateRequest)
+	//
+	//categoryResponse := controller.CategoryService.Create(request.Context(), categoryCreateRequest)
+	//webResponse := dto.ApiResponse{
+	//	Code:   200,
+	//	Status: "OK",
+	//	Data:   categoryResponse,
+	//}
+	//
+	//pkg.WriteToResponseBody(writer, webResponse)
 }
 
-func (controller *CategoryControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	categoryUpdateRequest := dto.CategoryUpdateRequest{}
-	pkg.ReadFromRequestBody(request, &categoryUpdateRequest)
+func (controller *CategoryControllerImpl) Update(ctx *fiber.Ctx) error {
+	panic("implement me")
+	//categoryUpdateRequest := dto.CategoryUpdateRequest{}
+	//pkg.ReadFromRequestBody(request, &categoryUpdateRequest)
+	//
+	//categoryId := params.ByName("categoryId")
+	//id, err := strconv.Atoi(categoryId)
+	//pkg.PanicIfError(err)
+	//
+	//categoryUpdateRequest.Id = id
+	//
+	//categoryResponse := controller.CategoryService.Update(request.Context(), categoryUpdateRequest)
+	//webResponse := dto.ApiResponse{
+	//	Code:   200,
+	//	Status: "OK",
+	//	Data:   categoryResponse,
+	//}
+	//
+	//pkg.WriteToResponseBody(writer, webResponse)
+}
 
-	categoryId := params.ByName("categoryId")
+func (controller *CategoryControllerImpl) Delete(ctx *fiber.Ctx) error {
+	panic("implement me")
+	//categoryId := params.ByName("categoryId")
+	//id, err := strconv.Atoi(categoryId)
+	//pkg.PanicIfError(err)
+	//
+	//controller.CategoryService.Delete(request.Context(), id)
+	//webResponse := dto.ApiResponse{
+	//	Code:   200,
+	//	Status: "OK",
+	//}
+	//
+	//pkg.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *CategoryControllerImpl) FindById(ctx *fiber.Ctx) error {
+	categoryId := ctx.Params("categoryId")
 	id, err := strconv.Atoi(categoryId)
 	pkg.PanicIfError(err)
 
-	categoryUpdateRequest.Id = id
-
-	categoryResponse := controller.CategoryService.Update(request.Context(), categoryUpdateRequest)
-	webResponse := dto.ApiResponse{
+	result := controller.CategoryService.FindById(ctx, id)
+	return ctx.JSON(dto.ApiResponse{
 		Code:   200,
 		Status: "OK",
-		Data:   categoryResponse,
-	}
-
-	pkg.WriteToResponseBody(writer, webResponse)
-}
-
-func (controller *CategoryControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	categoryId := params.ByName("categoryId")
-	id, err := strconv.Atoi(categoryId)
-	pkg.PanicIfError(err)
-
-	controller.CategoryService.Delete(request.Context(), id)
-	webResponse := dto.ApiResponse{
-		Code:   200,
-		Status: "OK",
-	}
-
-	pkg.WriteToResponseBody(writer, webResponse)
-}
-
-func (controller *CategoryControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	categoryId := params.ByName("categoryId")
-	id, err := strconv.Atoi(categoryId)
-	pkg.PanicIfError(err)
-
-	categoryResponse := controller.CategoryService.FindById(request.Context(), id)
-	webResponse := dto.ApiResponse{
-		Code:   200,
-		Status: "OK",
-		Data:   categoryResponse,
-	}
-
-	pkg.WriteToResponseBody(writer, webResponse)
+		Data:   result,
+	})
 }
 
 func (controller *CategoryControllerImpl) FindAll(ctx *fiber.Ctx) error {
-	categoryResponses := controller.CategoryService.FindAll(ctx)
-	webResponse := dto.ApiResponse{
+	result := controller.CategoryService.FindAll(ctx)
+	return ctx.JSON(dto.ApiResponse{
 		Code:   200,
 		Status: "OK",
-		Data:   categoryResponses,
-	}
-	return ctx.JSON(webResponse)
+		Data:   result,
+	})
 }

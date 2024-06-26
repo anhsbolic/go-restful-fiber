@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"go-restful-fiber/app"
 	"go-restful-fiber/config"
 	"go-restful-fiber/pkg"
 	"go-restful-fiber/routes"
@@ -24,7 +23,7 @@ func main() {
 	})
 
 	// Setup DB
-	db := app.NewDB()
+	db := pkg.NewDB()
 
 	// Setup Validator
 	validate := validator.New()

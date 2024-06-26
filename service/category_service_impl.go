@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"database/sql"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +25,7 @@ func NewCategoryService(categoryRepository repository.CategoryRepository, db *sq
 	}
 }
 
-func (service *CategoryServiceImpl) Create(ctx context.Context, request dto.CategoryCreateRequest) dto.CategoryResponse {
+func (service *CategoryServiceImpl) Create(ctx *fiber.Ctx, request dto.CategoryCreateRequest) dto.CategoryResponse {
 	err := service.Validate.Struct(request)
 	pkg.PanicIfError(err)
 
@@ -43,7 +42,7 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request dto.Cate
 	return dto.ToCategoryResponse(category)
 }
 
-func (service *CategoryServiceImpl) Update(ctx context.Context, request dto.CategoryUpdateRequest) dto.CategoryResponse {
+func (service *CategoryServiceImpl) Update(ctx *fiber.Ctx, request dto.CategoryUpdateRequest) dto.CategoryResponse {
 	err := service.Validate.Struct(request)
 	pkg.PanicIfError(err)
 
@@ -63,7 +62,7 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request dto.Cate
 	return dto.ToCategoryResponse(category)
 }
 
-func (service *CategoryServiceImpl) Delete(ctx context.Context, categoryId int) {
+func (service *CategoryServiceImpl) Delete(ctx *fiber.Ctx, categoryId int) {
 	tx, err := service.DB.Begin()
 	pkg.PanicIfError(err)
 	defer pkg.CommitOrRollback(tx)
@@ -76,7 +75,7 @@ func (service *CategoryServiceImpl) Delete(ctx context.Context, categoryId int) 
 	service.CategoryRepository.Delete(ctx, tx, category)
 }
 
-func (service *CategoryServiceImpl) FindById(ctx context.Context, categoryId int) dto.CategoryResponse {
+func (service *CategoryServiceImpl) FindById(ctx *fiber.Ctx, categoryId int) dto.CategoryResponse {
 	tx, err := service.DB.Begin()
 	pkg.PanicIfError(err)
 	defer pkg.CommitOrRollback(tx)

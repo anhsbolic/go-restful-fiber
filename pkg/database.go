@@ -1,11 +1,12 @@
-package app
+package pkg
 
 import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
+	sqldblogger "github.com/simukti/sqldb-logger"
+	"github.com/sirupsen/logrus"
 	"go-restful-fiber/config"
-	"go-restful-fiber/pkg"
 	"time"
 )
 
@@ -22,8 +23,18 @@ func NewDB() *sql.DB {
 		env.Get("DB_NAME"),
 		env.Get("DB_SSL_MODE"),
 	)
+
 	db, err := sql.Open("postgres", psqlInfo)
-	pkg.PanicIfError(err)
+	PanicIfError(err)
+
+	// Set Logger to DB
+	if env.Get("APP_ENV") == "local" {
+		db = sqldblogger.OpenDriver(
+			psqlInfo,
+			db.Driver(),
+			NewLogrusAdapter(logrus.New()),
+		)
+	}
 
 	// Set up database connection
 	db.SetMaxIdleConns(5)
