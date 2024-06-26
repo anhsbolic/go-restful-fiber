@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v2"
 	"go-restful-fiber/exception"
 	"go-restful-fiber/model/domain"
 	"go-restful-fiber/model/dto"
@@ -88,7 +89,7 @@ func (service *CategoryServiceImpl) FindById(ctx context.Context, categoryId int
 	return dto.ToCategoryResponse(category)
 }
 
-func (service *CategoryServiceImpl) FindAll(ctx context.Context) []dto.CategoryResponse {
+func (service *CategoryServiceImpl) FindAll(ctx *fiber.Ctx) []dto.CategoryResponse {
 	tx, err := service.DB.Begin()
 	pkg.PanicIfError(err)
 	defer pkg.CommitOrRollback(tx)

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"github.com/julienschmidt/httprouter"
 	"go-restful-fiber/model/dto"
 	"go-restful-fiber/pkg"
@@ -82,13 +83,12 @@ func (controller *CategoryControllerImpl) FindById(writer http.ResponseWriter, r
 	pkg.WriteToResponseBody(writer, webResponse)
 }
 
-func (controller *CategoryControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	categoryResponses := controller.CategoryService.FindAll(request.Context())
+func (controller *CategoryControllerImpl) FindAll(ctx *fiber.Ctx) error {
+	categoryResponses := controller.CategoryService.FindAll(ctx)
 	webResponse := dto.ApiResponse{
 		Code:   200,
 		Status: "OK",
 		Data:   categoryResponses,
 	}
-
-	pkg.WriteToResponseBody(writer, webResponse)
+	return ctx.JSON(webResponse)
 }

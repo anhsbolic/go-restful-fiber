@@ -1,5 +1,5 @@
 ### Get all categories
-GET http://localhost:3000/api/categories
+GET http://localhost:3000/api/v1/categories
 X-API-Key: RAHASIA
 Accept: application/json
 

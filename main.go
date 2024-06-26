@@ -3,19 +3,25 @@ package main
 import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v2"
 	"go-restful-fiber/app"
 	"go-restful-fiber/config"
-	"go-restful-fiber/controller"
-	"go-restful-fiber/middleware"
 	"go-restful-fiber/pkg"
-	"go-restful-fiber/repository"
-	"go-restful-fiber/service"
-	"net/http"
+	"go-restful-fiber/routes"
+	"time"
 )
 
 func main() {
 	// Get Config
 	env := config.GetEnvConfig()
+
+	// Setup Server
+	addr := fmt.Sprintf(":%s", env.Get("APP_PORT"))
+	server := fiber.New(fiber.Config{
+		IdleTimeout:  time.Second * 30,
+		ReadTimeout:  time.Second * 30,
+		WriteTimeout: time.Second * 30,
+	})
 
 	// Setup DB
 	db := app.NewDB()
@@ -23,19 +29,10 @@ func main() {
 	// Setup Validator
 	validate := validator.New()
 
-	// Setup Category API
-	categoryRepository := repository.NewCategoryRepository()
-	categoryService := service.NewCategoryService(categoryRepository, db, validate)
-	categoryController := controller.NewCategoryController(categoryService)
-	router := app.NewRouter(categoryController)
+	// Setup Routes
+	routes.InitCategoryRoutes(server, db, validate)
 
-	// Setup Server
-	addr := fmt.Sprintf(":%s", env.Get("APP_PORT"))
-	server := http.Server{
-		Addr:    addr,
-		Handler: middleware.NewAuthMiddleware(router),
-	}
-
-	err := server.ListenAndServe()
+	// Start Server
+	err := server.Listen(addr)
 	pkg.PanicIfError(err)
 }

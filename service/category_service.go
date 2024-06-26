@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/gofiber/fiber/v2"
 	"go-restful-fiber/model/dto"
 )
 
@@ -10,5 +11,5 @@ type CategoryService interface {
 	Update(ctx context.Context, request dto.CategoryUpdateRequest) dto.CategoryResponse
 	Delete(ctx context.Context, categoryId int)
 	FindById(ctx context.Context, categoryId int) dto.CategoryResponse
-	FindAll(ctx context.Context) []dto.CategoryResponse
+	FindAll(ctx *fiber.Ctx) []dto.CategoryResponse
 }

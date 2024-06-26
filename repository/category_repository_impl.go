@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/gofiber/fiber/v2"
 	"go-restful-fiber/model/domain"
 	"go-restful-fiber/pkg"
 )
@@ -52,9 +53,9 @@ func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.
 	}
 }
 
-func (repository *CategoryRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Category {
+func (repository *CategoryRepositoryImpl) FindAll(ctx *fiber.Ctx, tx *sql.Tx) []domain.Category {
 	SQL := "select id, name from categories"
-	rows, err := tx.QueryContext(ctx, SQL)
+	rows, err := tx.QueryContext(ctx.Context(), SQL)
 	pkg.PanicIfError(err)
 	defer rows.Close()
 
