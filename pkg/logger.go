@@ -1,17 +1,22 @@
-package helper
+package pkg
 
 import (
 	"github.com/sirupsen/logrus"
+	"go-restful-fiber/config"
 	"os"
 )
 
 func NewLogger() *logrus.Logger {
-	env := "development"
+	// Get Config
+	env := config.GetEnvConfig()
+	appEnv := env.Get("APP_ENV")
+
+	// Set Logger
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{})
 	logLevel := logrus.TraceLevel
 	logOutput := os.Stdout
-	if env == "production" {
+	if appEnv == "production" {
 		logLevel = logrus.InfoLevel
 		logOutput = os.Stdout
 	}

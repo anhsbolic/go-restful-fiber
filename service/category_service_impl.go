@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"github.com/go-playground/validator/v10"
 	"go-restful-fiber/exception"
-	"go-restful-fiber/helper"
 	"go-restful-fiber/model/domain"
 	"go-restful-fiber/model/dto"
+	"go-restful-fiber/pkg"
 	"go-restful-fiber/repository"
 )
 
@@ -27,11 +27,11 @@ func NewCategoryService(categoryRepository repository.CategoryRepository, db *sq
 
 func (service *CategoryServiceImpl) Create(ctx context.Context, request dto.CategoryCreateRequest) dto.CategoryResponse {
 	err := service.Validate.Struct(request)
-	helper.PanicIfError(err)
+	pkg.PanicIfError(err)
 
 	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
+	pkg.PanicIfError(err)
+	defer pkg.CommitOrRollback(tx)
 
 	category := domain.Category{
 		Name: request.Name,
@@ -44,11 +44,11 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request dto.Cate
 
 func (service *CategoryServiceImpl) Update(ctx context.Context, request dto.CategoryUpdateRequest) dto.CategoryResponse {
 	err := service.Validate.Struct(request)
-	helper.PanicIfError(err)
+	pkg.PanicIfError(err)
 
 	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
+	pkg.PanicIfError(err)
+	defer pkg.CommitOrRollback(tx)
 
 	category, err := service.CategoryRepository.FindById(ctx, tx, request.Id)
 	if err != nil {
@@ -64,8 +64,8 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request dto.Cate
 
 func (service *CategoryServiceImpl) Delete(ctx context.Context, categoryId int) {
 	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
+	pkg.PanicIfError(err)
+	defer pkg.CommitOrRollback(tx)
 
 	category, err := service.CategoryRepository.FindById(ctx, tx, categoryId)
 	if err != nil {
@@ -77,8 +77,8 @@ func (service *CategoryServiceImpl) Delete(ctx context.Context, categoryId int) 
 
 func (service *CategoryServiceImpl) FindById(ctx context.Context, categoryId int) dto.CategoryResponse {
 	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
+	pkg.PanicIfError(err)
+	defer pkg.CommitOrRollback(tx)
 
 	category, err := service.CategoryRepository.FindById(ctx, tx, categoryId)
 	if err != nil {
@@ -90,8 +90,8 @@ func (service *CategoryServiceImpl) FindById(ctx context.Context, categoryId int
 
 func (service *CategoryServiceImpl) FindAll(ctx context.Context) []dto.CategoryResponse {
 	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
+	pkg.PanicIfError(err)
+	defer pkg.CommitOrRollback(tx)
 
 	categories := service.CategoryRepository.FindAll(ctx, tx)
 

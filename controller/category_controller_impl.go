@@ -2,8 +2,8 @@ package controller
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"go-restful-fiber/helper"
 	"go-restful-fiber/model/dto"
+	"go-restful-fiber/pkg"
 	"go-restful-fiber/service"
 	"net/http"
 	"strconv"
@@ -21,7 +21,7 @@ func NewCategoryController(categoryService service.CategoryService) CategoryCont
 
 func (controller *CategoryControllerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	categoryCreateRequest := dto.CategoryCreateRequest{}
-	helper.ReadFromRequestBody(request, &categoryCreateRequest)
+	pkg.ReadFromRequestBody(request, &categoryCreateRequest)
 
 	categoryResponse := controller.CategoryService.Create(request.Context(), categoryCreateRequest)
 	webResponse := dto.ApiResponse{
@@ -30,16 +30,16 @@ func (controller *CategoryControllerImpl) Create(writer http.ResponseWriter, req
 		Data:   categoryResponse,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	pkg.WriteToResponseBody(writer, webResponse)
 }
 
 func (controller *CategoryControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	categoryUpdateRequest := dto.CategoryUpdateRequest{}
-	helper.ReadFromRequestBody(request, &categoryUpdateRequest)
+	pkg.ReadFromRequestBody(request, &categoryUpdateRequest)
 
 	categoryId := params.ByName("categoryId")
 	id, err := strconv.Atoi(categoryId)
-	helper.PanicIfError(err)
+	pkg.PanicIfError(err)
 
 	categoryUpdateRequest.Id = id
 
@@ -50,13 +50,13 @@ func (controller *CategoryControllerImpl) Update(writer http.ResponseWriter, req
 		Data:   categoryResponse,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	pkg.WriteToResponseBody(writer, webResponse)
 }
 
 func (controller *CategoryControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	categoryId := params.ByName("categoryId")
 	id, err := strconv.Atoi(categoryId)
-	helper.PanicIfError(err)
+	pkg.PanicIfError(err)
 
 	controller.CategoryService.Delete(request.Context(), id)
 	webResponse := dto.ApiResponse{
@@ -64,13 +64,13 @@ func (controller *CategoryControllerImpl) Delete(writer http.ResponseWriter, req
 		Status: "OK",
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	pkg.WriteToResponseBody(writer, webResponse)
 }
 
 func (controller *CategoryControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	categoryId := params.ByName("categoryId")
 	id, err := strconv.Atoi(categoryId)
-	helper.PanicIfError(err)
+	pkg.PanicIfError(err)
 
 	categoryResponse := controller.CategoryService.FindById(request.Context(), id)
 	webResponse := dto.ApiResponse{
@@ -79,7 +79,7 @@ func (controller *CategoryControllerImpl) FindById(writer http.ResponseWriter, r
 		Data:   categoryResponse,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	pkg.WriteToResponseBody(writer, webResponse)
 }
 
 func (controller *CategoryControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
@@ -90,5 +90,5 @@ func (controller *CategoryControllerImpl) FindAll(writer http.ResponseWriter, re
 		Data:   categoryResponses,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	pkg.WriteToResponseBody(writer, webResponse)
 }

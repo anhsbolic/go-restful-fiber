@@ -3,14 +3,14 @@ package exception
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
-	"go-restful-fiber/helper"
 	"go-restful-fiber/model/dto"
+	"go-restful-fiber/pkg"
 	"net/http"
 )
 
 func ErrorHandler(writer http.ResponseWriter, request *http.Request, err interface{}) {
 	// Init Logger
-	logger := helper.NewLogger()
+	logger := pkg.NewLogger()
 
 	// Return error
 	if notFoundError(writer, request, err) {
@@ -41,7 +41,7 @@ func internalServerError(writer http.ResponseWriter, request *http.Request, err 
 		Data:   err,
 	}
 
-	helper.WriteToResponseBody(writer, apiResponse)
+	pkg.WriteToResponseBody(writer, apiResponse)
 }
 
 func notFoundError(writer http.ResponseWriter, request *http.Request, err interface{}) bool {
@@ -56,7 +56,7 @@ func notFoundError(writer http.ResponseWriter, request *http.Request, err interf
 			Data:   exception.Error,
 		}
 
-		helper.WriteToResponseBody(writer, webResponse)
+		pkg.WriteToResponseBody(writer, webResponse)
 		return true
 	} else {
 		return false
@@ -75,7 +75,7 @@ func validationErrors(writer http.ResponseWriter, request *http.Request, err int
 			Data:   exception.Error(),
 		}
 
-		helper.WriteToResponseBody(writer, webResponse)
+		pkg.WriteToResponseBody(writer, webResponse)
 		return true
 	} else {
 		return false

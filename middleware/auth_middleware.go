@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"go-restful-fiber/helper"
 	"go-restful-fiber/model/dto"
+	"go-restful-fiber/pkg"
 	"net/http"
 )
 
@@ -28,6 +28,6 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 			Status: "UNAUTHORIZED",
 		}
 
-		helper.WriteToResponseBody(writer, webResponse)
+		pkg.WriteToResponseBody(writer, webResponse)
 	}
 }

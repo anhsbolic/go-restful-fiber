@@ -1,17 +1,22 @@
 package main
 
 import (
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"go-restful-fiber/app"
+	"go-restful-fiber/config"
 	"go-restful-fiber/controller"
-	"go-restful-fiber/helper"
 	"go-restful-fiber/middleware"
+	"go-restful-fiber/pkg"
 	"go-restful-fiber/repository"
 	"go-restful-fiber/service"
 	"net/http"
 )
 
 func main() {
+	// Get Config
+	env := config.GetEnvConfig()
+
 	// Setup DB
 	db := app.NewDB()
 
@@ -25,11 +30,12 @@ func main() {
 	router := app.NewRouter(categoryController)
 
 	// Setup Server
+	addr := fmt.Sprintf(":%s", env.Get("APP_PORT"))
 	server := http.Server{
-		Addr:    "localhost:3000",
+		Addr:    addr,
 		Handler: middleware.NewAuthMiddleware(router),
 	}
 
 	err := server.ListenAndServe()
-	helper.PanicIfError(err)
+	pkg.PanicIfError(err)
 }
