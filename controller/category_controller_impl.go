@@ -3,7 +3,6 @@ package controller
 import (
 	"github.com/gofiber/fiber/v2"
 	"go-restful-fiber/model/dto"
-	"go-restful-fiber/pkg"
 	"go-restful-fiber/service"
 	"strconv"
 )
@@ -19,18 +18,22 @@ func NewCategoryController(categoryService service.CategoryService) CategoryCont
 }
 
 func (controller *CategoryControllerImpl) Create(ctx *fiber.Ctx) error {
-	panic("implement me")
-	//categoryCreateRequest := dto.CategoryCreateRequest{}
-	//pkg.ReadFromRequestBody(request, &categoryCreateRequest)
-	//
-	//categoryResponse := controller.CategoryService.Create(request.Context(), categoryCreateRequest)
-	//webResponse := dto.ApiResponse{
-	//	Code:   200,
-	//	Status: "OK",
-	//	Data:   categoryResponse,
-	//}
-	//
-	//pkg.WriteToResponseBody(writer, webResponse)
+	request := new(dto.CategoryCreateRequest)
+	err := ctx.BodyParser(request)
+	if err != nil {
+		return err
+	}
+
+	result, err := controller.CategoryService.Create(ctx, *request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(fiber.StatusCreated).JSON(dto.ApiResponseSuccess{
+		Success: true,
+		Message: "Category has been created",
+		Data:    result,
+	})
 }
 
 func (controller *CategoryControllerImpl) Update(ctx *fiber.Ctx) error {
@@ -72,21 +75,31 @@ func (controller *CategoryControllerImpl) Delete(ctx *fiber.Ctx) error {
 func (controller *CategoryControllerImpl) FindById(ctx *fiber.Ctx) error {
 	categoryId := ctx.Params("categoryId")
 	id, err := strconv.Atoi(categoryId)
-	pkg.PanicIfError(err)
+	if err != nil {
+		return err
+	}
 
-	result := controller.CategoryService.FindById(ctx, id)
-	return ctx.JSON(dto.ApiResponse{
-		Code:   200,
-		Status: "OK",
-		Data:   result,
+	result, err := controller.CategoryService.FindById(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(dto.ApiResponseSuccess{
+		Success: true,
+		Message: "Detail of Category",
+		Data:    result,
 	})
 }
 
 func (controller *CategoryControllerImpl) FindAll(ctx *fiber.Ctx) error {
-	result := controller.CategoryService.FindAll(ctx)
-	return ctx.JSON(dto.ApiResponse{
-		Code:   200,
-		Status: "OK",
-		Data:   result,
+	result, err := controller.CategoryService.FindAll(ctx)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(dto.ApiResponseSuccess{
+		Success: true,
+		Message: "List of categories",
+		Data:    result,
 	})
 }

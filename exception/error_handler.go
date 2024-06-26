@@ -1,83 +1,65 @@
 package exception
 
 import (
-	"github.com/go-playground/validator/v10"
-	"github.com/sirupsen/logrus"
+	"errors"
+	"github.com/gofiber/fiber/v2"
 	"go-restful-fiber/model/dto"
 	"go-restful-fiber/pkg"
-	"net/http"
 )
 
-func ErrorHandler(writer http.ResponseWriter, request *http.Request, err interface{}) {
+func NewErrorHandler(ctx *fiber.Ctx, err error) error {
 	// Init Logger
 	logger := pkg.NewLogger()
 
-	// Return error
-	if notFoundError(writer, request, err) {
-		return
+	// Status code defaults to 500
+	code := fiber.StatusInternalServerError
+
+	// Retrieve the custom status code if it's a *fiber.Error
+	var e *fiber.Error
+	if errors.As(err, &e) {
+		code = e.Code
 	}
 
-	if validationErrors(writer, request, err) {
-		logger.WithFields(logrus.Fields{
-			"error":  err,
-			"host":   request.Host,
-			"method": request.Method,
-			"uri":    request.RequestURI,
-		}).Infof("Validation Error")
-		return
+	// Return if Not Found
+	if code == fiber.StatusNotFound {
+		return ctx.Status(code).JSON(dto.ApiResponseFail{
+			Success: false,
+			Message: "Not Found",
+		})
 	}
 
+	// Return if Bad Request
+	if code == fiber.StatusBadRequest {
+		return ctx.Status(code).JSON(dto.ApiResponseError{
+			Success:   false,
+			Message:   "Bad Request",
+			ErrorCode: "BAD_REQUEST",
+			Errors:    err.Error(),
+		})
+	}
+
+	// Return if Unauthorized
+	if code == fiber.StatusUnauthorized {
+		return ctx.Status(code).JSON(dto.ApiResponseFail{
+			Success: false,
+			Message: "Unauthorized",
+		})
+	}
+
+	// Return if Forbidden
+	if code == fiber.StatusForbidden {
+		return ctx.Status(code).JSON(dto.ApiResponseFail{
+			Success: false,
+			Message: "Forbidden",
+		})
+	}
+
+	// Logging Error
 	logger.Error(err)
-	internalServerError(writer, request, err)
-}
 
-func internalServerError(writer http.ResponseWriter, request *http.Request, err interface{}) {
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusInternalServerError)
-
-	apiResponse := dto.ApiResponse{
-		Code:   http.StatusInternalServerError,
-		Status: "Internal Server Error",
-		Data:   err,
-	}
-
-	pkg.WriteToResponseBody(writer, apiResponse)
-}
-
-func notFoundError(writer http.ResponseWriter, request *http.Request, err interface{}) bool {
-	exception, ok := err.(NotFoundError)
-	if ok {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusNotFound)
-
-		webResponse := dto.ApiResponse{
-			Code:   http.StatusNotFound,
-			Status: "NOT FOUND",
-			Data:   exception.Error,
-		}
-
-		pkg.WriteToResponseBody(writer, webResponse)
-		return true
-	} else {
-		return false
-	}
-}
-
-func validationErrors(writer http.ResponseWriter, request *http.Request, err interface{}) bool {
-	exception, ok := err.(validator.ValidationErrors)
-	if ok {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-
-		webResponse := dto.ApiResponse{
-			Code:   http.StatusBadRequest,
-			Status: "BAD REQUEST",
-			Data:   exception.Error(),
-		}
-
-		pkg.WriteToResponseBody(writer, webResponse)
-		return true
-	} else {
-		return false
-	}
+	// Return Internal Server Error
+	return ctx.Status(code).JSON(dto.ApiResponseFail{
+		Success: false,
+		Message: "Internal Server Error",
+	})
 }

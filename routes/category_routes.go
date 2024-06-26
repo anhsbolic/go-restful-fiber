@@ -16,6 +16,8 @@ func InitCategoryRoutes(server *fiber.App, db *sql.DB, validate *validator.Valid
 	categoryController := controller.NewCategoryController(categoryService)
 
 	// Set Routes
-	server.Get("/api/v1/categories", categoryController.FindAll)
-	server.Get("/api/v1/categories/:categoryId", categoryController.FindById)
+	v1CategoriesAPI := server.Group("/api/v1/categories")
+	v1CategoriesAPI.Post("/", categoryController.Create)
+	v1CategoriesAPI.Get("/", categoryController.FindAll)
+	v1CategoriesAPI.Get("/:categoryId", categoryController.FindById)
 }

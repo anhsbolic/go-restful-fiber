@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"go-restful-fiber/exception"
 	"go-restful-fiber/model/domain"
 	"go-restful-fiber/model/dto"
 	"go-restful-fiber/pkg"
@@ -25,75 +24,87 @@ func NewCategoryService(categoryRepository repository.CategoryRepository, db *sq
 	}
 }
 
-func (service *CategoryServiceImpl) Create(ctx *fiber.Ctx, request dto.CategoryCreateRequest) dto.CategoryResponse {
+func (service *CategoryServiceImpl) Create(ctx *fiber.Ctx, request dto.CategoryCreateRequest) (dto.CategoryResponse, error) {
 	err := service.Validate.Struct(request)
-	pkg.PanicIfError(err)
+	if err != nil {
+		return dto.CategoryResponse{}, fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
 
 	tx, err := service.DB.Begin()
-	pkg.PanicIfError(err)
-	defer pkg.CommitOrRollback(tx)
+	if err != nil {
+		return dto.CategoryResponse{}, err
+	}
 
+	defer pkg.CommitOrRollback(tx)
 	category := domain.Category{
 		Name: request.Name,
 	}
-
 	category = service.CategoryRepository.Save(ctx, tx, category)
 
-	return dto.ToCategoryResponse(category)
+	return dto.ToCategoryResponse(category), nil
 }
 
-func (service *CategoryServiceImpl) Update(ctx *fiber.Ctx, request dto.CategoryUpdateRequest) dto.CategoryResponse {
+func (service *CategoryServiceImpl) Update(ctx *fiber.Ctx, request dto.CategoryUpdateRequest) (dto.CategoryResponse, error) {
 	err := service.Validate.Struct(request)
-	pkg.PanicIfError(err)
+	if err != nil {
+		return dto.CategoryResponse{}, fiber.ErrBadRequest
+	}
 
 	tx, err := service.DB.Begin()
-	pkg.PanicIfError(err)
-	defer pkg.CommitOrRollback(tx)
+	if err != nil {
+		return dto.CategoryResponse{}, err
+	}
 
+	defer pkg.CommitOrRollback(tx)
 	category, err := service.CategoryRepository.FindById(ctx, tx, request.Id)
 	if err != nil {
-		panic(exception.NewNotFoundError(err.Error()))
+		return dto.CategoryResponse{}, fiber.ErrNotFound
 	}
-
 	category.Name = request.Name
-
 	category = service.CategoryRepository.Update(ctx, tx, category)
 
-	return dto.ToCategoryResponse(category)
+	return dto.ToCategoryResponse(category), nil
 }
 
-func (service *CategoryServiceImpl) Delete(ctx *fiber.Ctx, categoryId int) {
+func (service *CategoryServiceImpl) Delete(ctx *fiber.Ctx, categoryId int) error {
 	tx, err := service.DB.Begin()
-	pkg.PanicIfError(err)
-	defer pkg.CommitOrRollback(tx)
-
-	category, err := service.CategoryRepository.FindById(ctx, tx, categoryId)
 	if err != nil {
-		panic(exception.NewNotFoundError(err.Error()))
+		return err
 	}
 
+	defer pkg.CommitOrRollback(tx)
+	category, err := service.CategoryRepository.FindById(ctx, tx, categoryId)
+	if err != nil {
+		return fiber.ErrNotFound
+	}
 	service.CategoryRepository.Delete(ctx, tx, category)
+
+	return nil
 }
 
-func (service *CategoryServiceImpl) FindById(ctx *fiber.Ctx, categoryId int) dto.CategoryResponse {
+func (service *CategoryServiceImpl) FindById(ctx *fiber.Ctx, categoryId int) (dto.CategoryResponse, error) {
 	tx, err := service.DB.Begin()
-	pkg.PanicIfError(err)
-	defer pkg.CommitOrRollback(tx)
-
-	category, err := service.CategoryRepository.FindById(ctx, tx, categoryId)
 	if err != nil {
-		panic(exception.NewNotFoundError(err.Error()))
+		return dto.CategoryResponse{}, err
 	}
 
-	return dto.ToCategoryResponse(category)
+	defer pkg.CommitOrRollback(tx)
+	category, err := service.CategoryRepository.FindById(ctx, tx, categoryId)
+	if err != nil {
+		return dto.CategoryResponse{}, fiber.ErrNotFound
+	}
+
+	return dto.ToCategoryResponse(category), nil
 }
 
-func (service *CategoryServiceImpl) FindAll(ctx *fiber.Ctx) []dto.CategoryResponse {
+func (service *CategoryServiceImpl) FindAll(ctx *fiber.Ctx) ([]dto.CategoryResponse, error) {
 	tx, err := service.DB.Begin()
-	pkg.PanicIfError(err)
-	defer pkg.CommitOrRollback(tx)
+	if err != nil {
+		return []dto.CategoryResponse{}, err
+	}
 
+	defer pkg.CommitOrRollback(tx)
 	categories := service.CategoryRepository.FindAll(ctx, tx)
 
-	return dto.ToCategoryResponses(categories)
+	return dto.ToCategoryResponses(categories), nil
 }

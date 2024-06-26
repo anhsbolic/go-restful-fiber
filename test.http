@@ -4,17 +4,17 @@ X-API-Key: RAHASIA
 Accept: application/json
 
 ### Create new category
-POST http://localhost:3000/api/categories
+POST http://localhost:3000/api/v1/categories
 X-API-Key: RAHASIA
 Accept: application/json
 Content-Type: application/json
 
 {
-  "name" : "Food"
+  "namesss" : "Food 2"
 }
 
 ### Get category by Id
-GET http://localhost:3000/api/v1/categories/0
+GET http://localhost:3000/api/v1/categories/5
 X-API-Key: RAHASIA
 Accept: application/json
 
