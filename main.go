@@ -31,11 +31,14 @@ func main() {
 	// Setup DB
 	db := pkg.NewDB()
 
+	// Setup Redis
+	redisClient := pkg.NewRedisClient()
+
 	// Setup Validator
 	validate := validator.New()
 
 	// Setup Routes
-	routes.InitCategoryRoutes(server, db, validate)
+	routes.InitCategoryRoutes(server, db, validate, redisClient)
 
 	// Start Server
 	err := server.Listen(addr)

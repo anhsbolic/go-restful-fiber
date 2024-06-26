@@ -4,15 +4,16 @@ import (
 	"database/sql"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/redis/go-redis/v9"
 	"go-restful-fiber/controller"
 	"go-restful-fiber/repository"
 	"go-restful-fiber/service"
 )
 
-func InitCategoryRoutes(server *fiber.App, db *sql.DB, validate *validator.Validate) {
+func InitCategoryRoutes(server *fiber.App, db *sql.DB, validate *validator.Validate, redisClient *redis.Client) {
 	// Setup Category API
 	categoryRepository := repository.NewCategoryRepository()
-	categoryService := service.NewCategoryService(categoryRepository, db, validate)
+	categoryService := service.NewCategoryService(categoryRepository, db, validate, redisClient)
 	categoryController := controller.NewCategoryController(categoryService)
 
 	// Set Routes
