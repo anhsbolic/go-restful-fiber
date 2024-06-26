@@ -2,20 +2,32 @@ package exception
 
 import (
 	"github.com/go-playground/validator/v10"
+	"github.com/sirupsen/logrus"
 	"go-restful-fiber/helper"
 	"go-restful-fiber/model/dto"
 	"net/http"
 )
 
 func ErrorHandler(writer http.ResponseWriter, request *http.Request, err interface{}) {
+	// Init Logger
+	logger := helper.NewLogger()
+
+	// Return error
 	if notFoundError(writer, request, err) {
 		return
 	}
 
 	if validationErrors(writer, request, err) {
+		logger.WithFields(logrus.Fields{
+			"error":  err,
+			"host":   request.Host,
+			"method": request.Method,
+			"uri":    request.RequestURI,
+		}).Infof("Validation Error")
 		return
 	}
 
+	logger.Error(err)
 	internalServerError(writer, request, err)
 }
 
