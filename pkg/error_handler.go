@@ -1,15 +1,14 @@
-package exception
+package pkg
 
 import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"go-restful-fiber/model/dto"
-	"go-restful-fiber/pkg"
 )
 
 func NewErrorHandler(ctx *fiber.Ctx, err error) error {
 	// Init Logger
-	logger := pkg.NewLogger()
+	logger := NewLogger()
 
 	// Status code defaults to 500
 	code := fiber.StatusInternalServerError

@@ -5,7 +5,6 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"go-restful-fiber/config"
-	"go-restful-fiber/exception"
 	"go-restful-fiber/middleware"
 	"go-restful-fiber/pkg"
 	"go-restful-fiber/routes"
@@ -23,7 +22,7 @@ func main() {
 		ReadTimeout:  time.Second * 30,
 		WriteTimeout: time.Second * 30,
 		Prefork:      true,
-		ErrorHandler: exception.NewErrorHandler,
+		ErrorHandler: pkg.NewErrorHandler,
 	})
 
 	// Set Global Middleware
